@@ -23,5 +23,3 @@ jobs:
 
   steps:
     - template: nuget-default.yml@templates
-      parameters:
-        gitVersionFilePath: $(System.DefaultWorkingDirectory)/.ci/GitVersion.yml

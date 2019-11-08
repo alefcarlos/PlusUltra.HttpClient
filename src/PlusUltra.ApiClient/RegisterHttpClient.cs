@@ -10,7 +10,7 @@ namespace PlusUltra.ApiClient
 {
     public static class RegisterHttpClient
     {
-        public static IHttpClientBuilder AddRefit<T>(this IServiceCollection services, Action<HttpClient> configureClient, bool enableLogging = false) where T : class
+        public static IHttpClientBuilder AddApiClient<T>(this IServiceCollection services, Action<HttpClient> configureClient) where T : class
         {
             var refitSettings = new RefitSettings
             {
@@ -22,15 +22,12 @@ namespace PlusUltra.ApiClient
                         })
             };
 
-            if (enableLogging && !services.Any(svc => svc.ImplementationType == typeof(HttpLoggingHandler)))
+            if (!services.Any(svc => svc.ImplementationType == typeof(HttpLoggingHandler)))
                 services.AddTransient<HttpLoggingHandler>();
 
-            var client = services.AddRefitClient<T>(refitSettings).ConfigureHttpClient(configureClient);
-
-            if (enableLogging)
-                client.AddHttpMessageHandler<HttpLoggingHandler>();
-
-            return client;
+            return services.AddRefitClient<T>(refitSettings)
+                .ConfigureHttpClient(configureClient)
+                .AddHttpMessageHandler<HttpLoggingHandler>();
         }
     }
 }

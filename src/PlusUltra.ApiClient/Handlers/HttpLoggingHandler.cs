@@ -6,26 +6,31 @@ using System.Net.Http.Headers;
 using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
+using Microsoft.FeatureManagement;
 
 namespace PlusUltra.ApiClient
 {
     public class HttpLoggingHandler : DelegatingHandler
     {
-        public HttpLoggingHandler(ILogger<HttpLoggingHandler> logger)
+        public HttpLoggingHandler(ILogger<HttpLoggingHandler> logger, IFeatureManager featureManager)
         {
             this.logger = logger;
+            this.featureManager = featureManager;
         }
 
         private readonly ILogger logger;
+        private readonly IFeatureManager featureManager;
+        
         async protected override Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken cancellationToken)
         {
+            if (!featureManager.IsEnabled(nameof(EHttpFeatureFlags.ApiClientLoggingEnabled)))
+                return await base.SendAsync(request, cancellationToken);
+
             var req = request;
             var id = Guid.NewGuid();
 
-            using (logger.BeginScope($"[{id} - Begin Logger Request]"))
+            using (logger.BeginScope($"[{id} - Begin Logger Request"))
             {
-
-
                 logger.LogInformation($"========Start==========");
                 logger.LogInformation($"{req.Method} {req.RequestUri.PathAndQuery} {req.RequestUri.Scheme}/{req.Version}");
                 logger.LogInformation($"Host: {req.RequestUri.Scheme}://{req.RequestUri.Host}");
@@ -44,14 +49,13 @@ namespace PlusUltra.ApiClient
 
                         logger.LogInformation($"Content:");
                         logger.LogInformation($"{string.Join("", result.Cast<char>().Take(255))}...");
-
                     }
                 }
             }
 
             var response = await base.SendAsync(request, cancellationToken);
 
-            using (logger.BeginScope($"[{id} - Begin Logger Response]"))
+            using (logger.BeginScope($"[{id} - Begin Logger Response"))
             {
                 logger.LogInformation($"=========Start=========");
 

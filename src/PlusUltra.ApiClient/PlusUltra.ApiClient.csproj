@@ -7,7 +7,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.FeatureManagement" Version="1.0.0-preview-009000001-1251" />
-    <PackageReference Include="refit" Version="4.8.14" />
+    <PackageReference Include="refit" Version="7.2.22" />
     <PackageReference Include="Refit.HttpClientFactory" Version="4.8.14" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="3.0.0" />
     <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="3.0.0" />
